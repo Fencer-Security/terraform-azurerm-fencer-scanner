@@ -29,6 +29,29 @@ output "client_secret" {
 After `terraform apply`, copy the `tenant_id`, `client_id`, and `client_secret`
 (`terraform output -raw client_secret`) into the Azure connection form in Fencer.
 
+### Use from Pulumi
+
+Pulumi consumes this module directly — no rewrite. Add it to your project, then instantiate the generated
+`Module` component (works in TypeScript, Python, Go, or YAML):
+
+```bash
+pulumi package add terraform-module Fencer-Security/fencer-scanner/azurerm 1.0.0 fencerscanner
+```
+
+```ts
+import * as fencerscanner from "@pulumi/fencerscanner";
+
+const scanner = new fencerscanner.Module("fencer-scanner", {
+  subscription_id: "00000000-0000-0000-0000-000000000000",
+});
+
+export const tenantId = scanner.tenant_id;
+export const clientId = scanner.client_id;
+export const clientSecret = scanner.client_secret;
+```
+
+Inputs and outputs mirror the module's variables/outputs documented below.
+
 ### What gets created
 
 - An Entra ID app registration + service principal (`Fencer Scanner`) with a client secret.
