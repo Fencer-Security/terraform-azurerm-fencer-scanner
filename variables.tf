@@ -27,6 +27,12 @@ variable "override_actions" {
   default     = null
 }
 
+variable "override_data_actions" {
+  type        = list(string)
+  description = "Replace Fencer's default custom-role data action list entirely with this list. Leave null to use the default; an empty list means Fencer cannot read your Microsoft Foundry agents."
+  default     = null
+}
+
 variable "enable_container_scanning" {
   type        = bool
   description = "Assign the roles required to scan container images in Azure Container Registry and AKS."

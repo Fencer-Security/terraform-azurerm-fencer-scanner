@@ -4,6 +4,11 @@ locals {
   # hand). Supply override_actions to replace the list wholesale with actions you control.
   scanner_actions = var.override_actions != null ? var.override_actions : split("\n", trimspace(file("${path.module}/role_actions.txt")))
 
+  # Data-plane permissions Reader never grants (role_data_actions.txt, generated the same way): reading
+  # the agents in Microsoft Foundry projects for Fencer's AI agent inventory. Supply
+  # override_data_actions to replace the list; an empty list leaves Foundry agents unread.
+  scanner_data_actions = var.override_data_actions != null ? var.override_data_actions : split("\n", trimspace(file("${path.module}/role_data_actions.txt")))
+
   subscription_scope = "/subscriptions/${var.subscription_id}"
 
   acr_ids         = var.enable_container_scanning ? toset(var.acr_ids) : toset([])
@@ -35,7 +40,8 @@ resource "azurerm_role_definition" "fencer_scanner" {
   description = "Additional actions Fencer's configuration scanning requires beyond Reader."
 
   permissions {
-    actions = local.scanner_actions
+    actions      = local.scanner_actions
+    data_actions = local.scanner_data_actions
   }
 
   assignable_scopes = [local.subscription_scope]

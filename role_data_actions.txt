@@ -1,0 +1,1 @@
+Microsoft.CognitiveServices/accounts/AIServices/agents/read
