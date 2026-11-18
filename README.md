@@ -57,11 +57,12 @@ Inputs and outputs mirror the module's variables/outputs documented below.
 - An Entra ID app registration + service principal (`Fencer Scanner`) with a client secret.
 - A **Reader** role assignment at the subscription scope.
 - A custom role (`Fencer Scanner Role`) with the additional actions Fencer needs (the exact list lives in
-  [`role_actions.txt`](./role_actions.txt)), and its assignment.
+  [`role_actions.txt`](./role_actions.txt)) and the data actions that let it read the agents in your
+  Microsoft Foundry projects ([`role_data_actions.txt`](./role_data_actions.txt)), and its assignment.
 - Optionally, `AcrPull` on the listed container registries and `Azure Kubernetes Service Cluster Admin
   Role` on the listed AKS clusters for container scanning.
 
-`role_actions.txt` is generated from Fencer's single source of truth; the console instructions, this
+`role_actions.txt` and `role_data_actions.txt` are generated from Fencer's single source of truth; the console instructions, this
 module, and Fencer's connection validation all derive from it, so they never drift apart. Do not edit it
 by hand.
 
@@ -87,8 +88,10 @@ AKS scanning requires local accounts to be enabled on the cluster (the default).
 
 ### Custom permissions
 
-By default the custom role uses Fencer's action list (`role_actions.txt`). Supply `override_actions` to
-replace it wholesale with a list you own — all-or-nothing, either the default or yours.
+By default the custom role uses Fencer's action list (`role_actions.txt`) and data action list
+(`role_data_actions.txt`). Supply `override_actions` or `override_data_actions` to replace either wholesale
+with a list you own — all-or-nothing, either the default or yours. An empty `override_data_actions` leaves
+your Microsoft Foundry agents out of Fencer's AI agent inventory; everything else is still scanned.
 
 ```hcl
 module "fencer_scanner" {
@@ -115,6 +118,7 @@ module "fencer_scanner" {
 | `custom_role_name` | Name of the custom role for additional actions. | `string` | `"Fencer Scanner Role"` | no |
 | `client_secret_validity` | Client secret lifetime as a Go duration. | `string` | `"17520h"` | no |
 | `override_actions` | Full action list to use instead of Fencer's default custom-role actions. | `list(string)` | `null` | no |
+| `override_data_actions` | Full data action list to use instead of Fencer's default (reading Microsoft Foundry agents). | `list(string)` | `null` | no |
 | `enable_container_scanning` | Assign the ACR/AKS roles for container scanning. | `bool` | `false` | no |
 | `acr_ids` | Container registry resource IDs to grant AcrPull on. | `list(string)` | `[]` | no |
 | `aks_cluster_ids` | AKS cluster resource IDs to grant Cluster Admin on. | `list(string)` | `[]` | no |
